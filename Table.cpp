@@ -2,7 +2,7 @@
 #include <iostream>
 #include <sstream>
 
-Table::Table(std::istream &file_in, HasHeader h): num_rows{0}, header{true}, num_cols{0} {
+Table::Table(std::istream &file_in, HasHeader h): num_rows{0}, header{true}, num_cols{0}, id{-1} {
 	std::string line;
 
 	setHeader(bool(h));
@@ -14,19 +14,19 @@ Table::Table(std::istream &file_in, HasHeader h): num_rows{0}, header{true}, num
 	num_cols = (num_rows != 0 ? rows[num_rows-1].size() : 0); 
 }
 
-void Table::printHeader() {
-	if (hasHeader()) printrow(0);
+void Table::printHeader(PrintWithId id) {
+	defs::select_cols sel;
+	sel.ALL = true;
+	if (hasHeader()) printrow(0, sel, id);
 }
 
 int Table::addNewRow(std::istream &file_in) {
 	std::string col_data = "";
 	std::vector<string> row;
-	bool end_row = false;
 	bool quoted = false;
 	while (file_in && !file_in.eof()) {
 		char c = file_in.get();
 		if (quoted && c == '"') {
-			col_data += c;
 			if (file_in.peek() == '"') col_data += file_in.get();
 			else quoted = false;
 		}
@@ -37,7 +37,7 @@ int Table::addNewRow(std::istream &file_in) {
 			quoted = false;
 		}
 		else {
-			col_data += c;
+			col_data += (c != '"' ? c : '\0');
 			quoted = quoted | (c == '"');
 		}
 	}
@@ -46,14 +46,22 @@ int Table::addNewRow(std::istream &file_in) {
 	return num_rows++;
 }
 
-void Table::printrow(int row_id) {
+void Table::printrow(const int row_id, const defs::select_cols &sel, PrintWithId id) {
+	auto sel_cols = sel.cols;
+	if (!sel.ALL) merge_sort(sel_cols.begin(), sel_cols.end(), comparator_for_int);
+	int idx = 0;
 	for(int j = 0; j < rows[row_id].size(); j++) {
-		std::cout << rows[row_id][j] << " ";
+		if (!sel.ALL && idx >= sel_cols.size()) break;
+		if (sel.ALL || (j+1 == sel_cols[idx])) {
+			if (bool(id)) std::cout << j+1 << ": ";
+			std::cout << rows[row_id][j] << " ";
+			idx++;
+		}
 	}
 }
-void Table::printrows() {
+void Table::printrows(const defs::select_cols &sel) {
 	for (int i = (hasHeader() ? 0 : 1); i < num_rows; i++) {
-		printrow(i);
+		printrow(i, sel, PrintWithId::False);
 		std::cout << std::endl;
 	}
 }

@@ -6,9 +6,17 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include "utility.h"
+#include "defs.h"
+
 using namespace std;
 
 enum class HasHeader: bool {
+	False = false,
+	True = true
+};
+
+enum class PrintWithId: bool {
 	False = false,
 	True = true
 };
@@ -18,11 +26,10 @@ private:
 	// Map row id to Row
 	unordered_map <int, vector<string>> rows;
 	int num_rows, num_cols;
-	//unordered_map <int, shared_ptr<Index_tree>> metadata;
-	int num_idxs;
 	bool header;
+	int id;
 public:
-	Table() : num_rows{0}, num_idxs{0}, num_cols{0} {}
+	Table() : num_rows{0}, num_cols{0}, id{-1} {}
 
 	Table(istream &, HasHeader);
 
@@ -32,9 +39,12 @@ public:
 	bool hasHeader() { return header; }
 	void setHeader(bool flag) { header = flag; };
 
-	void printHeader();
-	void printrow(int);
-	void printrows();
+	void setId(int &_id) { id = _id; }
+	int getId() { return id; } 
+
+	void printHeader(PrintWithId);
+	void printrow(int, const defs::select_cols &, PrintWithId);
+	void printrows(const defs::select_cols &);
 
 	/*
 	stat * getStatistic(int &col_id, bool &flags) {

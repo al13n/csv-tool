@@ -1,47 +1,78 @@
 #pragma once
 #include <vector>
 #include <iterator>
+#include <climits>
+#include <string>
+namespace {
+	bool comparator_for_int(const int &a, const int &b) {
+		return a < b;
+	}
 
-template <class It, typename F>
-void merge_sort (It first, It second, F&& comp) {
-	typedef typename std::iterator_traits<It>::value_type v_type;
-	for (long int depth = 2; depth < ((second - first) << 1); depth <<= 1) {
-		It _traverse = first;
-		while ((second - _traverse) > (depth >> 1)) {
-			It _start = _traverse;
-			It _nexthalf = _traverse;
-			for (long int j = 0; j < (depth >> 1) && _nexthalf != second; j++) _nexthalf++;
-			std::vector<v_type> merged;
-			long int cnt1 = 0;
-			long int cnt2 = 0;
-			while (cnt1 < (depth >> 1) && cnt2 < (depth >> 1) && _nexthalf != second) {
-				if (comp(*_traverse, *_nexthalf)) {
+	template <class It, typename F>
+	void merge_sort (It first, It second, F&& comp) {
+		typedef typename std::iterator_traits<It>::value_type v_type;
+		for (long int depth = 2; depth < ((second - first) << 1); depth <<= 1) {
+			It _traverse = first;
+			while ((second - _traverse) > (depth >> 1)) {
+				It _start = _traverse;
+				It _nexthalf = _traverse;
+				for (long int j = 0; j < (depth >> 1) && _nexthalf != second; j++) _nexthalf++;
+				std::vector<v_type> merged;
+				long int cnt1 = 0;
+				long int cnt2 = 0;
+				while (cnt1 < (depth >> 1) && cnt2 < (depth >> 1) && _nexthalf != second) {
+					if (comp(*_traverse, *_nexthalf)) {
+						merged.push_back(*_traverse);
+						cnt1++;
+						_traverse++;
+					} else {
+						merged.push_back(*_nexthalf);
+						cnt2++;
+						_nexthalf++;
+					}
+				}
+				while (cnt1 < (depth >> 1) && _traverse != second) {
 					merged.push_back(*_traverse);
 					cnt1++;
 					_traverse++;
-				} else {
+				}
+				while (cnt2 < (depth >> 1) && _nexthalf != second) {
 					merged.push_back(*_nexthalf);
 					cnt2++;
 					_nexthalf++;
 				}
+				for (auto cpy: merged) {
+					*_start = cpy;
+					_start++;
+				}
+				
+				_traverse = _nexthalf;
 			}
-			while (cnt1 < (depth >> 1) && _traverse != second) {
-				merged.push_back(*_traverse);
-				cnt1++;
-				_traverse++;
-			}
-			while (cnt2 < (depth >> 1) && _nexthalf != second) {
-				merged.push_back(*_nexthalf);
-				cnt2++;
-				_nexthalf++;
-			}
-			for (auto cpy: merged) {
-				*_start = cpy;
-				_start++;
-			}
-			
-			_traverse = _nexthalf;
 		}
+		return ;
 	}
-	return ;
+
+
+	bool isPositiveInteger(std::string num) {
+		if (num.size() == 0) return false;
+
+		for (int i = 0; i < num.size(); i++) {
+			if (num[i] < '0' && num[i] > '9') return false;
+		}
+
+		unsigned int limit_check = 0;
+		for (int i = 0; i < num.size(); i++) {
+			if (limit_check > INT_MAX) return false;
+			limit_check = limit_check*10 + (num[i] - '0');
+		}
+		return true;
+	}
+
+	int getPositiveInteger(std::string num) {
+		int res = 0;
+		for (int i = 0; i < num.size(); i++) {
+			res = res*10 + (num[i] - '0');
+		}
+		return res;
+	}
 }

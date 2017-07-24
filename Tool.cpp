@@ -4,11 +4,14 @@
 #include <memory>
 #include "Table.h"
 #include "Options.h"
+#include "utility.h"
+#include "defs.h"
 using namespace std;
 
 unordered_map <string, int> files_id;
 unordered_map <int, shared_ptr<Table>> tables;
 int last_file_id = 0;
+defs::select_cols current_select;
 
 void outputFileId(string filename) {
 	if (files_id.find(filename) != files_id.end()) {
@@ -55,11 +58,53 @@ void getNewTableFromUser() {
 		
 		auto tbl = make_shared<Table>(csvfile, h);
 		tables.insert(make_pair(last_file_id, tbl));
+		tbl->setId(last_file_id);
 		outputFileId(filename);				
 		csvfile.close();
 	}
 	
 	return;
+}
+
+void selectColumns (shared_ptr<Table> tbl) {
+	bool invalid = false;
+	do {
+		invalid = false;
+		current_select.reset();
+		std::cout << "==>\t-----------------------------------------------------------\n";
+		std::cout << "==>\tSelect columns: " << std::endl;
+		if (tbl->hasHeader() && tbl->getNumberColumns() < defs::MAX_DISPLAY_COLUMNS) {
+			std::cout << "==>\t";
+			tbl->printHeader(PrintWithId::True);
+			std::cout << std::endl;	
+		} else {
+			std::cout << "==>\tNumber of columns in table: " << tbl->getNumberColumns() << std::endl;
+		}
+		std::cout << "==>\tEnter space-separated column number or * for all: (ex: 1 2 3 or *)\n"; 
+		std::cout << "==>\t-----------------------------------------------------------\n";
+		std::cout << "==>\t";
+		std::string choice;
+		getline(std::cin, choice);
+		stringstream ss(choice);
+		std::string col;
+		while(ss >> col) {
+			if (col == "*") {
+				current_select.ALL = true;
+				break;
+			} else {
+				if (isPositiveInteger(col) && getPositiveInteger(col) <= tbl->getNumberColumns()) {
+					current_select.cols.push_back(getPositiveInteger(col));
+				} else {
+					invalid = true;
+					break;
+				}
+			}
+		}
+		
+		if (invalid) {
+			std::cout << "Error ! Invalid columns entered, please check and enter\n";
+		}
+	} while(invalid);	
 }
 
 void viewTable() {
@@ -74,13 +119,12 @@ void viewTable() {
 	}
 	getChoice(avail_choices, choice); 
 	auto tbl = tables[stoi(choice)];
-	std::cout << "Select columns: " << std::endl;
-	if (tbl->hasHeader()) {
-		tbl->printHeader();
-		cout << endl;	
-	} else {
-		cout << "Number of columns in table: " << tbl->getNumberColumns() << endl;
-	}
+	selectColumns(tbl);
+	tbl->printrows(current_select);	
+}
+
+void init() {
+	current_select.reset();
 }
 
 int main() {
@@ -89,6 +133,7 @@ int main() {
 	MainMenuOptions choice;
 
 	do {
+		init();
 		choice = showMainMenu();
 		switch (choice) {
 			case MainMenuOptions::ADD_NEW_TABLE:
