@@ -53,6 +53,12 @@ void getChoice(vector<std::string> &avail_choices, std::string &choice) {
 	} while(!valid_choice);
 }
 
+void getYesNoChoice(std::string &choice) {
+	std::vector<std::string> avail_choices {"y", "Y", "n", "N"};
+	getChoice(avail_choices, choice);
+	choice[0] = choice[0] | (1<<5);
+}
+
 MainMenuOptions showMainMenu() {
 	cout << "-----------------------------------------------------------\n";
 	cout << "----------------TOOL MAIN MENU-----------------------------\n";

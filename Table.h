@@ -43,8 +43,8 @@ public:
 	int getId() { return id; } 
 
 	void printHeader(PrintWithId);
-	void printrow(int, const defs::select_cols &, PrintWithId);
-	void printrows(const defs::select_cols &);
+	void printrow(std::ostream &, int, const defs::select_cols &, PrintWithId);
+	void printrows(std::ostream &, const defs::select_cols &);
 
 	/*
 	stat * getStatistic(int &col_id, bool &flags) {

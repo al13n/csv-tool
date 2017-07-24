@@ -12,6 +12,7 @@ unordered_map <string, int> files_id;
 unordered_map <int, shared_ptr<Table>> tables;
 int last_file_id = 0;
 defs::select_cols current_select;
+std::ofstream out;
 
 void outputFileId(string filename) {
 	if (files_id.find(filename) != files_id.end()) {
@@ -26,6 +27,20 @@ void listallTables() {
 		outputFileId(f.first);
 	}
 	cout << "-----------------------------------------------------------\n";
+}
+
+std::ostream& getOutputStream() {
+	std::cout << "Output result to file? (y/n) ";
+	std::string choice = "";
+	getYesNoChoice(choice);
+	if (choice == "y") {
+		if (out.is_open()) out.close();
+		string filename;
+		std::cout << "Enter filename:\t";
+		getline(cin, filename);
+		out.open(filename, std::ios::app);
+	}
+	return (choice == "y" ? out : std::cout);
 }
 
 void getNewTableFromUser() {
@@ -49,10 +64,9 @@ void getNewTableFromUser() {
 		
 		std::cout << "Does this table contain a header?(y/n) ";
 		std::string choice;
-		std::vector<std::string> avail_choices {"y", "Y", "n", "N"};
-		getChoice(avail_choices, choice);
+		getYesNoChoice(choice);
 		HasHeader h = HasHeader::False;
-		if ((choice[0] | (1<<5)) == 'y') {
+		if (choice == "y") {
 			h = HasHeader::True;
 		}
 		
@@ -120,7 +134,8 @@ void viewTable() {
 	getChoice(avail_choices, choice); 
 	auto tbl = tables[stoi(choice)];
 	selectColumns(tbl);
-	tbl->printrows(current_select);	
+	std::ostream &os = getOutputStream();
+	tbl->printrows(os, current_select);	
 }
 
 void init() {

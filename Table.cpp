@@ -17,7 +17,7 @@ Table::Table(std::istream &file_in, HasHeader h): num_rows{0}, header{true}, num
 void Table::printHeader(PrintWithId id) {
 	defs::select_cols sel;
 	sel.ALL = true;
-	if (hasHeader()) printrow(0, sel, id);
+	if (hasHeader()) printrow(std::cout, 0, sel, id);
 }
 
 int Table::addNewRow(std::istream &file_in) {
@@ -46,7 +46,7 @@ int Table::addNewRow(std::istream &file_in) {
 	return num_rows++;
 }
 
-void Table::printrow(const int row_id, const defs::select_cols &sel, PrintWithId id) {
+void Table::printrow(std::ostream &os, const int row_id, const defs::select_cols &sel, PrintWithId id) {
 	auto sel_cols = sel.cols;
 	if (!sel.ALL) merge_sort(sel_cols.begin(), sel_cols.end(), comparator_for_int);
 	int idx = 0;
@@ -54,14 +54,14 @@ void Table::printrow(const int row_id, const defs::select_cols &sel, PrintWithId
 		if (!sel.ALL && idx >= sel_cols.size()) break;
 		if (sel.ALL || (j+1 == sel_cols[idx])) {
 			if (bool(id)) std::cout << j+1 << ": ";
-			std::cout << rows[row_id][j] << " ";
+			os << rows[row_id][j] << " ";
 			idx++;
 		}
 	}
 }
-void Table::printrows(const defs::select_cols &sel) {
+void Table::printrows(std::ostream &os, const defs::select_cols &sel) {
 	for (int i = (hasHeader() ? 0 : 1); i < num_rows; i++) {
-		printrow(i, sel, PrintWithId::False);
-		std::cout << std::endl;
+		printrow(os, i, sel, PrintWithId::False);
+		os << std::endl;
 	}
 }
