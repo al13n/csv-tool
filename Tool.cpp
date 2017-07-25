@@ -42,7 +42,7 @@ std::ostream& getOutputStream() {
 		string filename;
 		std::cout << "Enter filename:\t";
 		getline(cin, filename);
-		out.open(filename, std::ios::app);
+		out.open(filename, std::ios::out);
 	}
 	return (choice == "y" ? out : std::cout);
 }
@@ -140,7 +140,8 @@ shared_ptr<Table> selectTable() {
 		return nullptr;
 	}
 	
-	std::cout << "Enter table id: ";
+	std::cout << "==>\t-----------------------------------------------------------\n";
+	std::cout << "==>\tEnter table id: ";
 	std::string choice;
 	std::vector<std::string> avail_choices;
 	for (auto id: tables) {
@@ -149,6 +150,7 @@ shared_ptr<Table> selectTable() {
 		avail_choices.push_back(s);
 	}
 	getChoice(avail_choices, choice); 
+	std::cout << "==>\t-----------------------------------------------------------\n";
 	return tables[getPositiveInteger(choice)];
 }
 
@@ -195,7 +197,7 @@ void performArithmeticOp() {
 	if (tbl != nullptr) {
 		std::cout << "Select column 1:\n";
 		defs::select_cols sel1 = selectColumns(tbl, ChooseOne::True);
-		std::cout << "Operator: ";
+		std::cout << "Operator (ex: + or - or / or *):";
 		std::string choice;
 		std::vector <std::string> avail_choices(4);
 		avail_choices[0] += static_cast<char>(defs::ARITHMETIC_OP::PLUS); 
@@ -211,6 +213,34 @@ void performArithmeticOp() {
 		//tbl->performArithmeticOp(os, sel1, sel2, op);
 	}
 }
+
+void performJoin() {
+	std::cout << "Enter table 1:\n";
+	auto tbl1 = selectTable();
+	if (tbl1 == nullptr) return ;
+	std::cout << "Enter table 2:\n";
+	auto tbl2 = selectTable();
+	if (tbl2 == nullptr) return ;
+	
+	std::cout << "==>\tINFO: ON col1 == col2, where col1 is from table 1 and col2 is from table 2\n";
+	std::cout << "Select column 1:\n";
+	defs::select_cols sel1 = selectColumns(tbl1, ChooseOne::True);
+	std::cout << "Select column 2:\n";
+	defs::select_cols sel2 = selectColumns(tbl2, ChooseOne::True);
+	
+	std::cout << "JOIN TYPE (1: inner or 2: left outer or 3: right outer or 4: full outer): (ex: 1 or 2 or 3 or 4)";
+	std::string choice;
+	std::vector <std::string> avail_choices(4);
+	avail_choices[0] += static_cast<int>(defs::JOIN::INNER);
+	avail_choices[1] += static_cast<int>(defs::JOIN::OUTER_LEFT);
+	avail_choices[2] += static_cast<int>(defs::JOIN::OUTER_RIGHT);
+	avail_choices[3] += static_cast<int>(defs::JOIN::OUTER_FULL);
+	getChoice(avail_choices, choice);
+	defs::JOIN join_type = static_cast<defs::JOIN> (choice[0]);	
+	
+	std::ostream &os = getOutputStream();
+}
+
 
 void init() {
 	if (out.is_open()) out.close();
@@ -239,6 +269,7 @@ int main() {
 				performArithmeticOp();
 				break;
 			case MainMenuOptions::PERFORM_JOIN:
+				performJoin();
 				break;
 			case MainMenuOptions::DELETE_TABLE:
 				removeTable();

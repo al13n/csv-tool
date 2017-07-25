@@ -28,4 +28,11 @@ namespace defs {
 		DIVIDE = '/',
 		MULTIPLY = '*'
 	};
+	
+	enum class JOIN : int {
+		INNER = 1,
+		OUTER_LEFT = 2,
+		OUTER_RIGHT = 3,
+		OUTER_FULL = 4
+	};
 }
