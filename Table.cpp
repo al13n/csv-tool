@@ -52,7 +52,7 @@ void Table::printrow(std::ostream &os, const int row_id, const defs::select_cols
 	for(int j = 0; j < rows[row_id].size(); j++) {
 		if (!sel.ALL && idx >= sel_cols.size()) break;
 		if (sel.ALL || (j+1 == sel_cols[idx])) {
-			if (bool(id)) std::cout << "[id:" << j+1 << "]: ";
+			if (bool(id)) std::cout << "[id:" << j+1 << "] ";
 			os << *rows[row_id][j] << "\t";
 			idx++;
 		}

@@ -8,6 +8,7 @@ enum class MainMenuOptions {
 	GET_STATISTIC,
 	PERFORM_ARITHMETIC_OP,
 	PERFORM_JOIN,
+	DELETE_TABLE,
 	QUIT,
 	INVALID
 };
@@ -28,6 +29,9 @@ std::ostream& operator<<(std::ostream& os, MainMenuOptions opt) {
 			break;
 		case MainMenuOptions::PERFORM_JOIN:
 			os << "perform join [inner, outer-left,right,full] on two tables";
+			break;
+		case MainMenuOptions::DELETE_TABLE:
+			os << "remove a table";
 			break;
 		case MainMenuOptions::QUIT:
 			os << "quit application";
@@ -68,12 +72,13 @@ MainMenuOptions showMainMenu() {
 	cout << "3 " << MainMenuOptions::GET_STATISTIC << endl;	
 	cout << "4 " << MainMenuOptions::PERFORM_ARITHMETIC_OP << endl;	
 	cout << "5 " << MainMenuOptions::PERFORM_JOIN << endl;	
-	cout << "6 " << MainMenuOptions::QUIT << endl;
+	cout << "6 " << MainMenuOptions::DELETE_TABLE << endl;
+	cout << "7 " << MainMenuOptions::QUIT << endl;
 	cout << "-----------------------------------------------------------\n";
-	cout << "Enter number (1-6): ";
+	cout << "Enter number (1-7): ";
 	std::string choice;
 	std::vector<std::string> avail_choices;
-	for(int i = 1; i <= 6; i++) {
+	for(int i = 1; i <= 7; i++) {
 		char c = i + '0';
 		string s = ""; s = s + c;
 		avail_choices.push_back(s);
@@ -90,7 +95,9 @@ MainMenuOptions showMainMenu() {
 			return MainMenuOptions::PERFORM_ARITHMETIC_OP;
 		case 5:
 			return MainMenuOptions::PERFORM_JOIN;
-		case 6:
+		case 6: 
+			return MainMenuOptions::DELETE_TABLE;
+		case 7:
 			return MainMenuOptions::QUIT;
 		default:
 			break;

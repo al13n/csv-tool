@@ -8,20 +8,20 @@
 #include "defs.h"
 using namespace std;
 
-unordered_map <string, int> files_id;
-unordered_map <int, shared_ptr<Table>> tables;
+unordered_map <std::shared_ptr<std::string>, int> files_id;
+unordered_map <int, std::shared_ptr<Table>> tables;
 int last_file_id = 0;
 std::ofstream out;
 
-void outputFileId(string filename) {
-	if (files_id.find(filename) != files_id.end()) {
-		cout << "Filename: " << filename << "\tTable ID: " << files_id[filename] << endl; 
+void outputFileId(std::shared_ptr<std::string> filename_ptr) {
+	if (files_id.find(filename_ptr) != files_id.end()) {
+		std::cout << "Table ID: " << files_id[filename_ptr] << "\tFilename: " << *filename_ptr << std::endl; 
 	}
 }
 
 bool listallTables() {
 	if (tables.size() == 0) {
-		std::cout << "No tables have been inserted so far!\n";
+		std::cout << "No tables exist with the app!\n";
 		return false;
 	}
 	std::cout << "-----------------------------------------------------------\n";
@@ -52,11 +52,6 @@ void getNewTableFromUser() {
 	std::cout << "Enter filename:\t";
 	getline(cin, filename);
 		
-	if (files_id.find(filename) != files_id.end()) {
-		cout << "Table already exists [ID: " << files_id[filename] << "]\n";
-		return;
-	}
-	
 	ifstream csvfile(filename);
 	
 	if(!csvfile.is_open()) {
@@ -64,7 +59,8 @@ void getNewTableFromUser() {
 		return;
 	} else {
 		++last_file_id;
-		files_id.insert(make_pair(filename, last_file_id));
+		auto filename_ptr = make_shared<std::string>(filename);
+		files_id.insert(make_pair(filename_ptr, last_file_id));
 		
 		std::cout << "Does this table contain a header?(y/n) ";
 		std::string choice;
@@ -77,7 +73,8 @@ void getNewTableFromUser() {
 		auto tbl = make_shared<Table>(csvfile, h);
 		tables.insert(make_pair(last_file_id, tbl));
 		tbl->setId(last_file_id);
-		outputFileId(filename);				
+		tbl->setFilenamePtr(filename_ptr);
+		outputFileId(filename_ptr);
 		csvfile.close();
 	}
 	
@@ -156,6 +153,16 @@ void viewTable() {
 	return ;
 }
 
+void removeTable() {
+	auto tbl = selectTable();
+	if (tbl != nullptr) {
+		int id = tbl->getId();
+		files_id.erase(files_id.find(tbl->getFilenamePtr()));
+		tables.erase(tables.find(id));
+	}
+	return ;
+}
+
 void getStatistic() {
 	auto tbl = selectTable();
 	if (tbl != nullptr) {
@@ -200,6 +207,9 @@ int main() {
 			case MainMenuOptions::PERFORM_ARITHMETIC_OP:
 				break;
 			case MainMenuOptions::PERFORM_JOIN:
+				break;
+			case MainMenuOptions::DELETE_TABLE:
+				removeTable();
 				break;
 			case MainMenuOptions::QUIT:
 				break;
