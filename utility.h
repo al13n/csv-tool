@@ -9,6 +9,8 @@
 namespace {
 	template <typename T>
 	bool comp_for_metadata(const T &p1, const T &p2) {
+		if (p2.second->size() == 0) return false;
+		if (p1.second->size() == 0) return true;
 		double long val1 = strtold(p1.second->c_str(), NULL);
 		double long val2 = strtold(p2.second->c_str(), NULL);
 		return (val2 - val1) > LDBL_EPSILON;
@@ -16,7 +18,7 @@ namespace {
 	
 	template <typename T>
 	bool comp(const T &a, const T &b) {
-		return a < b;
+		return a <= b;
 	}
 
 	template <class It, typename F>
@@ -68,7 +70,7 @@ namespace {
 		if (num.size() == 0) return false;
 
 		for (int i = 0; i < num.size(); i++) {
-			if (num[i] < '0' && num[i] > '9') return false;
+			if (!(i == 0 && num[i] == '+') && (num[i] < '0' && num[i] > '9')) return false;
 		}
 
 		unsigned int limit_check = 0;
@@ -87,10 +89,12 @@ namespace {
 		return res;
 	}
 	
-	bool is_string_numeric(std::string num) {
-		char *end;
-		long double val = std::strtold(num.c_str(), &end);
-		if (errno != 0 || *end != '\0') return false;
+	bool is_string_numeric(std::shared_ptr<std::string> num) {
+		if (num->size() == 0) return false;
+		char *endptr;
+		const char* str = num->c_str();
+		long double val = std::strtold(str, &endptr);
+		if (errno != 0 || *endptr != '\0' || endptr == str) return false;
 		return true;
 	}
 }

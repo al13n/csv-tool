@@ -162,9 +162,16 @@ void getStatistic() {
 		cout << "Enter the column id(s) to get a statistic on: \n";
 		defs::select_cols current_select = selectColumns(tbl);
 		std::ostream &os = getOutputStream();
-		
+		merge_sort(current_select.cols.begin(), current_select.cols.end(), comp<int>);
+		int idx = 0;
+		for (int i = 1; i <= tbl->getNumberColumns(); i++) {
+			if (current_select.ALL || (current_select.cols[idx] == i)) {
+				idx++;
+				tbl->getStatistic(os, i);
+			}
+		}
 	}
-	return ;
+	return;
 }
 
 void init() {

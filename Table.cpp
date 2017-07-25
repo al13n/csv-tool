@@ -1,6 +1,4 @@
 #include "Table.h"
-#include <iostream>
-#include <sstream>
 
 Table::Table(std::istream &file_in, HasHeader h): next_row_id{0}, header{true}, num_cols{0}, id{-1} {
 	std::string line;
@@ -54,8 +52,8 @@ void Table::printrow(std::ostream &os, const int row_id, const defs::select_cols
 	for(int j = 0; j < rows[row_id].size(); j++) {
 		if (!sel.ALL && idx >= sel_cols.size()) break;
 		if (sel.ALL || (j+1 == sel_cols[idx])) {
-			if (bool(id)) std::cout << j+1 << ": ";
-			os << "[" << *rows[row_id][j] << "]\t";
+			if (bool(id)) std::cout << "[id:" << j+1 << "]: ";
+			os << *rows[row_id][j] << "\t";
 			idx++;
 		}
 	}
@@ -66,3 +64,74 @@ void Table::printrows(std::ostream &os, const defs::select_cols &sel) {
 		os << std::endl;
 	}
 }
+
+bool Table::createMetadata(int col_id) {
+	if (col_id > num_cols) return false;
+	col_id--;
+	if (col_metadata.find(col_id) != col_metadata.end()) return true;
+
+	auto meta = make_shared<Metadata>(col_id);
+	std::vector < std::shared_ptr<std::string> > ptrs;
+	for (int i = 1; i < next_row_id; i++) {
+		ptrs.push_back(rows[i][col_id]);
+	}
+	meta->setColumn(ptrs);
+	col_metadata.insert(make_pair(col_id, meta));
+	return true;
+}
+
+void Table::Metadata::setColumn(const std::vector < std::shared_ptr<std::string> > &ptrs) {
+	int row_id = 1;
+	for(auto ptr: ptrs) {
+		col_elements.push_back(make_pair(row_id, ptr));
+		row_id++;
+	}
+	
+	if (col_elements.size() != 0) {
+		for (auto col: col_elements) {
+			if (col.second->size() != 0) {
+				is_numeric &= is_string_numeric(col.second);
+			} else {
+				null_values++;
+			}
+		}
+	}
+
+	if (containsOnlyNullValues()) is_numeric = false;
+	
+	if (is_numeric) {
+		merge_sort(col_elements.begin(), col_elements.end(), comp_for_metadata<col_ele_type>);
+		sum = 0;
+		for(auto col: col_elements) {
+			if (col.second->size() != 0) {
+				sum += strtold(col.second->c_str(), NULL);
+			}
+		}
+	}
+}
+
+void Table::getStatistic(std::ostream& os, int col_id) {
+	if (next_row_id == 0 || (!header && next_row_id == 1)) return ;
+	
+	if (createMetadata(col_id)) {
+		os << "-----------------------------------------------------------\n";
+		os << "Stats for column: "<< col_id << std::endl;
+		os << "-----------------------------------------------------------\n";
+		
+		col_id--;
+		auto meta = col_metadata[col_id];
+		if (!meta->is_numeric || meta->containsOnlyNullValues()) {
+			os << "Err: Column is not numeric!\n";
+			os << "-----------------------------------------------------------\n";
+			return ; 
+		}
+		
+		os << "Median: " << meta->getMedian() << "\n";	
+		os << "Min: " << meta->getMin() << "\n";	
+		os << "Max: " << meta->getMax() << "\n";	
+		os << "Average: " << meta->getAverage() << "\n";	
+		os << "-----------------------------------------------------------\n";
+	}
+	return;
+}
+
