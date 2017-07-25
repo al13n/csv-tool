@@ -106,10 +106,7 @@ public:
 	void printrows(std::ostream &, const defs::select_cols &);
 
 	void getStatistic(std::ostream &, int);
-/*
-	vector<string> performOp(int &col_id_1, int &col_id_2, Operator op) {
 	
-	}
-	*/
+	void performArithmeticOp(std::ostream &, int, int, defs::ARITHMETIC_OP);
 
 };

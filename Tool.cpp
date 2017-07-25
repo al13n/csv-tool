@@ -55,7 +55,7 @@ void getNewTableFromUser() {
 	ifstream csvfile(filename);
 	
 	if(!csvfile.is_open()) {
-		cout << "Error: Failed to open " << filename << " ! Enter valid file" << endl;
+		cout << "==>\tError: Failed to open " << filename << " ! Enter valid file" << endl;
 		return;
 	} else {
 		++last_file_id;
@@ -128,7 +128,7 @@ defs::select_cols selectColumns (shared_ptr<Table> tbl, ChooseOne chooseOne) {
 		}
 		
 		if (invalid) {
-			std::cout << "Error ! Invalid columns entered, please check and enter\n";
+			std::cout << "==>\tError ! Invalid columns entered, please check and enter\n";
 		}
 	} while(invalid);
 

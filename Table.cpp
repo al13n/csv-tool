@@ -66,7 +66,7 @@ void Table::printrows(std::ostream &os, const defs::select_cols &sel) {
 }
 
 bool Table::createMetadata(int col_id) {
-	if (col_id > num_cols) return false;
+	if (col_id == 0 && col_id > num_cols) return false;
 	col_id--;
 	if (col_metadata.find(col_id) != col_metadata.end()) return true;
 
@@ -111,8 +111,6 @@ void Table::Metadata::setColumn(const std::vector < std::shared_ptr<std::string>
 }
 
 void Table::getStatistic(std::ostream& os, int col_id) {
-	if (next_row_id == 0 || (!header && next_row_id == 1)) return ;
-	
 	if (createMetadata(col_id)) {
 		os << "-----------------------------------------------------------\n";
 		os << "Stats for column: "<< col_id << std::endl;
@@ -121,7 +119,7 @@ void Table::getStatistic(std::ostream& os, int col_id) {
 		col_id--;
 		auto meta = col_metadata[col_id];
 		if (!meta->is_numeric || meta->containsOnlyNullValues()) {
-			os << "Err: Column is not numeric!\n";
+			os << "==>\tErr: Column is not numeric!\n";
 			os << "-----------------------------------------------------------\n";
 			return ; 
 		}
@@ -131,7 +129,23 @@ void Table::getStatistic(std::ostream& os, int col_id) {
 		os << "Max: " << meta->getMax() << "\n";	
 		os << "Average: " << meta->getAverage() << "\n";	
 		os << "-----------------------------------------------------------\n";
+	} else {
+		os << "==>\tErr: Invalid input!\n";
+		os << "-----------------------------------------------------------\n";
 	}
 	return;
 }
 
+void Table::performArithmeticOp(std::ostream &os, int col_id1, int col_id2, defs::ARITHMETIC_OP op) {
+	if (createMetadata(col_id1) && createMetadata(col_id2)) {
+		col_id1--;
+		col_id2--;
+		auto meta1 = col_metadata[col_id1];
+		auto meta2 = col_metadata[col_id2];
+		if (!meta1->is_numeric || !meta2->is_numeric) {
+			os << "==>\tErr: Column is not numeric!\n";
+			os << "-----------------------------------------------------------\n";
+			return ; 
+		}
+	}
+} 
