@@ -11,7 +11,6 @@ using namespace std;
 unordered_map <string, int> files_id;
 unordered_map <int, shared_ptr<Table>> tables;
 int last_file_id = 0;
-defs::select_cols current_select;
 std::ofstream out;
 
 void outputFileId(string filename) {
@@ -20,13 +19,19 @@ void outputFileId(string filename) {
 	}
 }
 
-void listallTables() {
-	cout << "-----------------------------------------------------------\n";
-	cout << "List of all existing tables:\n";
+bool listallTables() {
+	if (tables.size() == 0) {
+		std::cout << "No tables have been inserted so far!\n";
+		return false;
+	}
+	std::cout << "-----------------------------------------------------------\n";
+	std::cout << "List of all existing tables:\n";
+	std::cout << "Total number of tables: " << tables.size() << std::endl;
 	for(auto f: files_id) {
 		outputFileId(f.first);
 	}
-	cout << "-----------------------------------------------------------\n";
+	std::cout << "-----------------------------------------------------------\n";
+	return true;
 }
 
 std::ostream& getOutputStream() {
@@ -34,7 +39,6 @@ std::ostream& getOutputStream() {
 	std::string choice = "";
 	getYesNoChoice(choice);
 	if (choice == "y") {
-		if (out.is_open()) out.close();
 		string filename;
 		std::cout << "Enter filename:\t";
 		getline(cin, filename);
@@ -80,11 +84,13 @@ void getNewTableFromUser() {
 	return;
 }
 
-void selectColumns (shared_ptr<Table> tbl) {
+defs::select_cols selectColumns (shared_ptr<Table> tbl) {
+	if (tbl == nullptr) return defs::select_cols{};
+	
+	defs::select_cols current_select;
 	bool invalid = false;
 	do {
 		invalid = false;
-		current_select.reset();
 		std::cout << "==>\t-----------------------------------------------------------\n";
 		std::cout << "==>\tSelect columns: " << std::endl;
 		if (tbl->hasHeader() && tbl->getNumberColumns() < defs::MAX_DISPLAY_COLUMNS) {
@@ -118,11 +124,16 @@ void selectColumns (shared_ptr<Table> tbl) {
 		if (invalid) {
 			std::cout << "Error ! Invalid columns entered, please check and enter\n";
 		}
-	} while(invalid);	
+	} while(invalid);
+
+	return current_select;	
 }
 
-void viewTable() {
-	listallTables();	
+shared_ptr<Table> selectTable() {
+	if (!listallTables()) {
+		return nullptr;
+	}
+	
 	std::cout << "Enter table id: ";
 	std::string choice;
 	std::vector<std::string> avail_choices;
@@ -132,14 +143,32 @@ void viewTable() {
 		avail_choices.push_back(s);
 	}
 	getChoice(avail_choices, choice); 
-	auto tbl = tables[stoi(choice)];
-	selectColumns(tbl);
-	std::ostream &os = getOutputStream();
-	tbl->printrows(os, current_select);	
+	return tables[getPositiveInteger(choice)];
+}
+
+void viewTable() {
+	auto tbl = selectTable();
+	if (tbl != nullptr) {
+		defs::select_cols current_select = selectColumns(tbl);
+		std::ostream &os = getOutputStream();
+		tbl->printrows(os, current_select);
+	}
+	return ;
+}
+
+void getStatistic() {
+	auto tbl = selectTable();
+	if (tbl != nullptr) {
+		cout << "Enter the column id(s) to get a statistic on: \n";
+		defs::select_cols current_select = selectColumns(tbl);
+		std::ostream &os = getOutputStream();
+		
+	}
+	return ;
 }
 
 void init() {
-	current_select.reset();
+	if (out.is_open()) out.close();
 }
 
 int main() {
@@ -149,6 +178,7 @@ int main() {
 
 	do {
 		init();
+		std::cout << std::endl << std::endl;
 		choice = showMainMenu();
 		switch (choice) {
 			case MainMenuOptions::ADD_NEW_TABLE:
@@ -158,6 +188,7 @@ int main() {
 				viewTable();
 				break;
 			case MainMenuOptions::GET_STATISTIC:
+				getStatistic();
 				break;
 			case MainMenuOptions::PERFORM_ARITHMETIC_OP:
 				break;

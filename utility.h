@@ -3,8 +3,19 @@
 #include <iterator>
 #include <climits>
 #include <string>
+#include <cerrno>
+#include <cstdlib>
+
 namespace {
-	bool comparator_for_int(const int &a, const int &b) {
+	template <typename T>
+	bool comp_for_metadata(const T &p1, const T &p2) {
+		double long val1 = strtold(p1.second->c_str(), NULL);
+		double long val2 = strtold(p2.second->c_str(), NULL);
+		return (val2 - val1) > LDBL_EPSILON;
+	}
+	
+	template <typename T>
+	bool comp(const T &a, const T &b) {
 		return a < b;
 	}
 
@@ -74,5 +85,12 @@ namespace {
 			res = res*10 + (num[i] - '0');
 		}
 		return res;
+	}
+	
+	bool is_string_numeric(std::string num) {
+		char *end;
+		long double val = std::strtold(num.c_str(), &end);
+		if (errno != 0 || *end != '\0') return false;
+		return true;
 	}
 }
