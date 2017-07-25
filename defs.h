@@ -21,4 +21,11 @@ namespace defs {
 			reset();
 		}
 	};
+
+	enum class ARITHMETIC_OP : char {
+		PLUS = '+',
+		MINUS = '-',
+		DIVIDE = '/',
+		MULTIPLY = '*'
+	};
 }

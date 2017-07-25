@@ -13,6 +13,11 @@ enum class MainMenuOptions {
 	INVALID
 };
 
+enum class ChooseOne : bool {
+	False = false,
+	True = true
+};
+
 std::ostream& operator<<(std::ostream& os, MainMenuOptions opt) {
 	switch (opt) {
 		case MainMenuOptions::ADD_NEW_TABLE:

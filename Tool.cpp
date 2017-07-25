@@ -21,7 +21,7 @@ void outputFileId(std::shared_ptr<std::string> filename_ptr) {
 
 bool listallTables() {
 	if (tables.size() == 0) {
-		std::cout << "No tables exist with the app!\n";
+		std::cout << "No tables exist within the tool!\n";
 		return false;
 	}
 	std::cout << "-----------------------------------------------------------\n";
@@ -81,13 +81,14 @@ void getNewTableFromUser() {
 	return;
 }
 
-defs::select_cols selectColumns (shared_ptr<Table> tbl) {
+defs::select_cols selectColumns (shared_ptr<Table> tbl, ChooseOne chooseOne) {
 	if (tbl == nullptr) return defs::select_cols{};
 	
 	defs::select_cols current_select;
 	bool invalid = false;
 	do {
 		invalid = false;
+		current_select.reset();
 		std::cout << "==>\t-----------------------------------------------------------\n";
 		std::cout << "==>\tSelect columns: " << std::endl;
 		if (tbl->hasHeader() && tbl->getNumberColumns() < defs::MAX_DISPLAY_COLUMNS) {
@@ -97,7 +98,11 @@ defs::select_cols selectColumns (shared_ptr<Table> tbl) {
 		} else {
 			std::cout << "==>\tNumber of columns in table: " << tbl->getNumberColumns() << std::endl;
 		}
-		std::cout << "==>\tEnter space-separated column number or * for all: (ex: 1 2 3 or *)\n"; 
+		if (!bool(chooseOne)) {
+			std::cout << "==>\tEnter space-separated column number or * for all: (ex: 1 2 3 or *)\n"; 
+		} else {
+			std::cout << "==>\tEnter column number: (ex: 1)\n"; 
+		}
 		std::cout << "==>\t-----------------------------------------------------------\n";
 		std::cout << "==>\t";
 		std::string choice;
@@ -118,12 +123,16 @@ defs::select_cols selectColumns (shared_ptr<Table> tbl) {
 			}
 		}
 		
+		if((current_select.ALL || current_select.cols.size() != 1) && bool(chooseOne)) {
+			invalid = true;
+		}
+		
 		if (invalid) {
 			std::cout << "Error ! Invalid columns entered, please check and enter\n";
 		}
 	} while(invalid);
 
-	return current_select;	
+	return current_select;
 }
 
 shared_ptr<Table> selectTable() {
@@ -146,7 +155,7 @@ shared_ptr<Table> selectTable() {
 void viewTable() {
 	auto tbl = selectTable();
 	if (tbl != nullptr) {
-		defs::select_cols current_select = selectColumns(tbl);
+		defs::select_cols current_select = selectColumns(tbl, ChooseOne::False);
 		std::ostream &os = getOutputStream();
 		tbl->printrows(os, current_select);
 	}
@@ -167,7 +176,7 @@ void getStatistic() {
 	auto tbl = selectTable();
 	if (tbl != nullptr) {
 		cout << "Enter the column id(s) to get a statistic on: \n";
-		defs::select_cols current_select = selectColumns(tbl);
+		defs::select_cols current_select = selectColumns(tbl, ChooseOne::False);
 		std::ostream &os = getOutputStream();
 		merge_sort(current_select.cols.begin(), current_select.cols.end(), comp<int>);
 		int idx = 0;
@@ -179,6 +188,28 @@ void getStatistic() {
 		}
 	}
 	return;
+}
+
+void performArithmeticOp() {
+	auto tbl = selectTable();
+	if (tbl != nullptr) {
+		std::cout << "Select column 1:\n";
+		defs::select_cols sel1 = selectColumns(tbl, ChooseOne::True);
+		std::cout << "Operator: ";
+		std::string choice;
+		std::vector <std::string> avail_choices(4);
+		avail_choices[0] += static_cast<char>(defs::ARITHMETIC_OP::PLUS); 
+		avail_choices[1] += static_cast<char>(defs::ARITHMETIC_OP::MINUS); 
+		avail_choices[2] += static_cast<char>(defs::ARITHMETIC_OP::MULTIPLY); 
+		avail_choices[3] += static_cast<char>(defs::ARITHMETIC_OP::DIVIDE); 
+		getChoice(avail_choices, choice);
+		defs::ARITHMETIC_OP op = static_cast<defs::ARITHMETIC_OP> (choice[0]);	
+		std::cout << "Select column 2:\n";
+		defs::select_cols sel2 = selectColumns(tbl, ChooseOne::True);
+		std::ostream &os = getOutputStream();
+		
+		//tbl->performArithmeticOp(os, sel1, sel2, op);
+	}
 }
 
 void init() {
@@ -205,6 +236,7 @@ int main() {
 				getStatistic();
 				break;
 			case MainMenuOptions::PERFORM_ARITHMETIC_OP:
+				performArithmeticOp();
 				break;
 			case MainMenuOptions::PERFORM_JOIN:
 				break;
