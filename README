@@ -26,7 +26,7 @@ Tool.cpp Options.h:
 Holds the iteractive or client part of the tool which interactively builds the query or stores pointers to the backend tables.
 
 Table.h Table.cpp:
-Holds the class that parses a table, stores the table, builds metadata on top of columns when required and caches them for later use.The operations to perform joins and arithmetic ops are specified in this class. Joins -> use the sort, merge/join algorithm => complexity O(nlogn) => where n are the rows of table. 
+Holds the class that parses a table, stores the table, builds metadata on top of columns when required and caches them for later use.The operations to perform joins and arithmetic ops are specified in this class. Joins -> use the sort, merge/join algorithm => complexity O(nlogn + mlogm) for sorting and  O(nm) for the join [Overall O(nm)] => where n and m are the rows of table1 and table2. 
 
 Metadata.h Metadata.cpp:
 Holds the class that defines the metadata for a column which could possibly sort them, and compare them. It also provides statistic over that column
