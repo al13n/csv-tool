@@ -61,7 +61,8 @@ public:
 		return nullptr;
 	}
 	
-	//void performJoin(std::ostream &, std::shared_ptr<Table> &tbl, 
+	void performJoin(std::ostream &, std::shared_ptr<Table> &, defs::select_cols &, defs::select_cols &, defs::select_cols &, defs::select_cols &, defs::JOIN); 
+	
 private:
 	unordered_map <int, std::vector< std::shared_ptr<std::string> > > rows;
 	unordered_map <int, std::shared_ptr<Metadata> > col_metadata;

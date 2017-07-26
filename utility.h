@@ -5,6 +5,7 @@
 #include <string>
 #include <cerrno>
 #include <cstdlib>
+#include <memory>
 
 namespace {
 	template <typename T>

@@ -277,6 +277,7 @@ void performJoin() {
 	std::ostream &os = getOutputStream();
 	
 	std::cout << "\n\n\n";
+	tbl1->performJoin(os, tbl2, sel1, sel2, pred1, pred2, join_type);
 }
 
 

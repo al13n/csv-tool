@@ -27,12 +27,8 @@ class Metadata {
 		long double getMax();
 		long double getMin();
 		long double getAverage();
-		
-		bool is_numeric;
-		double long sum;
 	private:
 		int id;
-		int null_values;
 		
 		class meta_ele_type {
 		public:
@@ -46,6 +42,10 @@ class Metadata {
 			int row_id;
 			std::shared_ptr<std::string> str_ptr;
 		};
-		
+	public:
+		bool is_numeric;
+		double long sum;
 		std::vector < meta_ele_type > col_elements;
+		int null_values;
+	
 };

@@ -10,10 +10,12 @@ namespace defs {
 
 	struct select_cols {
 		bool ALL = false;
+		bool print_null = false;
 		std::vector<int> cols;
 		
 		void reset() {
 			ALL = false;
+			print_null = false;
 			cols.clear();
 		}
 		
