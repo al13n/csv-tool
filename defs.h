@@ -1,7 +1,7 @@
 #pragma once
 
 namespace defs {
-	const int MAX_DISPLAY_COLUMNS = 15;
+	const int MAX_DISPLAY_COLUMNS_HEADER = 30;
 	const std::string null = "[NULL]";
 
 	struct select_cols {

@@ -95,7 +95,7 @@ defs::select_cols selectColumns (shared_ptr<Table> tbl, ChooseOne chooseOne) {
 		current_select.reset();
 		std::cout << "==>\t-----------------------------------------------------------\n";
 		std::cout << "==>\tSelect columns: " << std::endl;
-		if (tbl->hasHeader() && tbl->getNumberColumns() < defs::MAX_DISPLAY_COLUMNS) {
+		if (tbl->hasHeader() && tbl->getNumberColumns() < defs::MAX_DISPLAY_COLUMNS_HEADER) {
 			std::cout << "==>\t";
 			tbl->printHeader(PrintWithId::True);
 			std::cout << std::endl;	
