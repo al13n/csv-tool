@@ -1,0 +1,574 @@
+HOW TO BUILD THE PROJECT:
+-----------------------------
+
+The source was built using gcc version 4.8.5, using g++ and -std=c++11 enabled.
+To build the project one can simply use the Makefile and run make on the terminal.
+BUILD COMMAND:
+	make
+
+PURPOSE:
+------------------------------
+
+This is a tool that serves the following purpose:
+- Parses a CSV file, as per these rules: https://en.wikipedia.org/wiki/Comma-separated_values#Basic_rules, and stored them as a Table.
+- Select columns from a particular file, and view the stored table. For eg: '*' lets you view all columns of table
+- Get statistic on a column from a table that contains numeric data - get median, max, min, average. (It does not take the null rows of the column into the statistic shown) 
+- Perform an arithmetic operation on two columns from the same table, and output the result as a new column.
+- Sort the rows of a table based on a particular column in ascending order
+- Perform a join - inner, left outer, right outer, full outer - on two tables based on a join predicate or the ON clause in sql (eg: table1.col1 == table2.col2)
+- Interactive tool, that could add a bunch of tables to the tool, remove table from the tool, and interactively builds the query that needs to be processed.
+
+
+DESIGN OF PROJECT:
+------------------------------
+
+Tool.cpp Options.h: 
+Holds the iteractive or client part of the tool which interactively builds the query or stores pointers to the backend tables.
+
+Table.h Table.cpp:
+Holds the class that parses a table, stores the table, builds metadata on top of columns when required and caches them for later use.The operations to perform joins and arithmetic ops are specified in this class.
+
+Metadata.h Metadata.cpp:
+Holds the class that defines the metadata for a column which could possibly sort them, and compare them. It also provides statistic over that column
+
+utility.h:
+Some utility functions, that contain the merge sort routine as well.
+
+
+HOW TO RUN:
+-------------------------------
+
+As this is a single tool, after building the project, one can run it using the executable tool, and this is an interactive menu driven application.
+
+RUN COMMAND:
+	./tool
+
+EXAMPLES:
+--------------------------------
+
+
+
+-----------------------------------------------------------
+----------------TOOL MAIN MENU-----------------------------
+
+Choose from the following options:
+1 add new table
+2 view table - (you could optionally select columns)
+3 get table statistics
+4 perform arithmetic operations [+,-,*,/] on two columns row-wise
+5 perform join [inner, outer-left,right,full] on two tables
+6 remove a table
+7 sort rows in ascending order based on column values
+8 quit application
+-----------------------------------------------------------
+Enter number (1-8): 1
+
+
+
+Enter filename:	tbl1.csv
+
+
+
+Does this table contain a header?(y/n) n
+
+
+
+Table ID: 1	Filename: tbl1.csv
+
+
+-----------------------------------------------------------
+----------------TOOL MAIN MENU-----------------------------
+
+Choose from the following options:
+1 add new table
+2 view table - (you could optionally select columns)
+3 get table statistics
+4 perform arithmetic operations [+,-,*,/] on two columns row-wise
+5 perform join [inner, outer-left,right,full] on two tables
+6 remove a table
+7 sort rows in ascending order based on column values
+8 quit application
+-----------------------------------------------------------
+Enter number (1-8): 2
+
+
+
+-----------------------------------------------------------
+List of all existing tables:
+Total number of tables: 1
+Table ID: 1	Filename: tbl1.csv
+-----------------------------------------------------------
+==>	-----------------------------------------------------------
+==>	Enter table id:
+==>	-----------------------------------------------------------
+==>	1
+==>	-----------------------------------------------------------
+
+
+
+==>	-----------------------------------------------------------
+==>	Select columns: 
+==>	Number of columns in table: 2
+==>	Enter space-separated column number or * for all: (ex: 1 2 3 or *)
+==>	-----------------------------------------------------------
+==>	*
+Output result to file? (y/n) n
+Rafferty	31	
+Jones	33	
+Heisenberg	33	
+Robinson	34	
+Smith	34	
+Williams	[NULL]	
+
+
+-----------------------------------------------------------
+----------------TOOL MAIN MENU-----------------------------
+
+Choose from the following options:
+1 add new table
+2 view table - (you could optionally select columns)
+3 get table statistics
+4 perform arithmetic operations [+,-,*,/] on two columns row-wise
+5 perform join [inner, outer-left,right,full] on two tables
+6 remove a table
+7 sort rows in ascending order based on column values
+8 quit application
+-----------------------------------------------------------
+Enter number (1-8): 1
+
+
+
+Enter filename:	tbl2.csv
+
+
+
+Does this table contain a header?(y/n) n
+
+
+
+Table ID: 2	Filename: tbl2.csv
+
+
+-----------------------------------------------------------
+----------------TOOL MAIN MENU-----------------------------
+
+Choose from the following options:
+1 add new table
+2 view table - (you could optionally select columns)
+3 get table statistics
+4 perform arithmetic operations [+,-,*,/] on two columns row-wise
+5 perform join [inner, outer-left,right,full] on two tables
+6 remove a table
+7 sort rows in ascending order based on column values
+8 quit application
+-----------------------------------------------------------
+Enter number (1-8): 2
+
+
+
+-----------------------------------------------------------
+List of all existing tables:
+Total number of tables: 2
+Table ID: 2	Filename: tbl2.csv
+Table ID: 1	Filename: tbl1.csv
+-----------------------------------------------------------
+==>	-----------------------------------------------------------
+==>	Enter table id:
+==>	-----------------------------------------------------------
+==>	2
+==>	-----------------------------------------------------------
+
+
+
+==>	-----------------------------------------------------------
+==>	Select columns: 
+==>	Number of columns in table: 2
+==>	Enter space-separated column number or * for all: (ex: 1 2 3 or *)
+==>	-----------------------------------------------------------
+==>	2  
+Output result to file? (y/n) n
+Sales	
+Engineering	
+Clerical	
+Marketing	
+
+
+-----------------------------------------------------------
+----------------TOOL MAIN MENU-----------------------------
+
+Choose from the following options:
+1 add new table
+2 view table - (you could optionally select columns)
+3 get table statistics
+4 perform arithmetic operations [+,-,*,/] on two columns row-wise
+5 perform join [inner, outer-left,right,full] on two tables
+6 remove a table
+7 sort rows in ascending order based on column values
+8 quit application
+-----------------------------------------------------------
+Enter number (1-8): 3
+
+
+
+-----------------------------------------------------------
+List of all existing tables:
+Total number of tables: 2
+Table ID: 2	Filename: tbl2.csv
+Table ID: 1	Filename: tbl1.csv
+-----------------------------------------------------------
+==>	-----------------------------------------------------------
+==>	Enter table id:
+==>	-----------------------------------------------------------
+==>	1
+==>	-----------------------------------------------------------
+
+
+
+Enter the column id(s) to get a statistic on: 
+==>	-----------------------------------------------------------
+==>	Select columns: 
+==>	Number of columns in table: 2
+==>	Enter space-separated column number or * for all: (ex: 1 2 3 or *)
+==>	-----------------------------------------------------------
+==>	2
+
+
+
+Output result to file? (y/n) n
+
+
+
+-----------------------------------------------------------
+Stats for column: 2
+-----------------------------------------------------------
+Median: 33
+Min: 31
+Max: 34
+Average: 33
+-----------------------------------------------------------
+
+
+-----------------------------------------------------------
+----------------TOOL MAIN MENU-----------------------------
+
+Choose from the following options:
+1 add new table
+2 view table - (you could optionally select columns)
+3 get table statistics
+4 perform arithmetic operations [+,-,*,/] on two columns row-wise
+5 perform join [inner, outer-left,right,full] on two tables
+6 remove a table
+7 sort rows in ascending order based on column values
+8 quit application
+-----------------------------------------------------------
+Enter number (1-8): 4
+
+
+
+-----------------------------------------------------------
+List of all existing tables:
+Total number of tables: 2
+Table ID: 2	Filename: tbl2.csv
+Table ID: 1	Filename: tbl1.csv
+-----------------------------------------------------------
+==>	-----------------------------------------------------------
+==>	Enter table id:
+==>	-----------------------------------------------------------
+==>	1
+==>	-----------------------------------------------------------
+
+
+
+Select column 1:
+==>	-----------------------------------------------------------
+==>	Select columns: 
+==>	Number of columns in table: 2
+==>	Enter column number: (ex: 1)
+==>	-----------------------------------------------------------
+==>	1
+
+
+
+Operator (ex: + or - or * or /):
+==>	-----------------------------------------------------------
+==>	+
+
+
+
+Select column 2:
+==>	-----------------------------------------------------------
+==>	Select columns: 
+==>	Number of columns in table: 2
+==>	Enter column number: (ex: 1)
+==>	-----------------------------------------------------------
+==>	1
+
+
+
+Output result to file? (y/n) n
+
+
+
+==>	Err: Column is not numeric!
+-----------------------------------------------------------
+
+
+-----------------------------------------------------------
+----------------TOOL MAIN MENU-----------------------------
+
+Choose from the following options:
+1 add new table
+2 view table - (you could optionally select columns)
+3 get table statistics
+4 perform arithmetic operations [+,-,*,/] on two columns row-wise
+5 perform join [inner, outer-left,right,full] on two tables
+6 remove a table
+7 sort rows in ascending order based on column values
+8 quit application
+-----------------------------------------------------------
+Enter number (1-8): 4
+
+
+
+-----------------------------------------------------------
+List of all existing tables:
+Total number of tables: 2
+Table ID: 2	Filename: tbl2.csv
+Table ID: 1	Filename: tbl1.csv
+-----------------------------------------------------------
+==>	-----------------------------------------------------------
+==>	Enter table id:
+==>	-----------------------------------------------------------
+==>	1
+==>	-----------------------------------------------------------
+
+
+
+Select column 1:
+==>	-----------------------------------------------------------
+==>	Select columns: 
+==>	Number of columns in table: 2
+==>	Enter column number: (ex: 1)
+==>	-----------------------------------------------------------
+==>	2
+
+
+
+Operator (ex: + or - or * or /):
+==>	-----------------------------------------------------------
+==>	+
+
+
+
+Select column 2:
+==>	-----------------------------------------------------------
+==>	Select columns: 
+==>	Number of columns in table: 2
+==>	Enter column number: (ex: 1)
+==>	-----------------------------------------------------------
+==>	2
+
+
+
+Output result to file? (y/n) n
+
+
+
+62
+66
+66
+68
+68
+[NULL]
+
+
+-----------------------------------------------------------
+----------------TOOL MAIN MENU-----------------------------
+
+Choose from the following options:
+1 add new table
+2 view table - (you could optionally select columns)
+3 get table statistics
+4 perform arithmetic operations [+,-,*,/] on two columns row-wise
+5 perform join [inner, outer-left,right,full] on two tables
+6 remove a table
+7 sort rows in ascending order based on column values
+8 quit application
+-----------------------------------------------------------
+Enter number (1-8): 7
+
+
+
+-----------------------------------------------------------
+List of all existing tables:
+Total number of tables: 2
+Table ID: 2	Filename: tbl2.csv
+Table ID: 1	Filename: tbl1.csv
+-----------------------------------------------------------
+==>	-----------------------------------------------------------
+==>	Enter table id:
+==>	-----------------------------------------------------------
+==>	1
+==>	-----------------------------------------------------------
+
+
+
+Select columns to output from table:
+==>	-----------------------------------------------------------
+==>	Select columns: 
+==>	Number of columns in table: 2
+==>	Enter space-separated column number or * for all: (ex: 1 2 3 or *)
+==>	-----------------------------------------------------------
+==>	*
+
+
+
+Select col from table based on which you want to sort rows on:
+==>	-----------------------------------------------------------
+==>	Select columns: 
+==>	Number of columns in table: 2
+==>	Enter column number: (ex: 1)
+==>	-----------------------------------------------------------
+==>	2
+
+
+
+Output result to file? (y/n) n
+
+
+
+Williams	[NULL]	
+Rafferty	31	
+Jones	33	
+Heisenberg	33	
+Robinson	34	
+Smith	34	
+
+
+-----------------------------------------------------------
+----------------TOOL MAIN MENU-----------------------------
+
+Choose from the following options:
+1 add new table
+2 view table - (you could optionally select columns)
+3 get table statistics
+4 perform arithmetic operations [+,-,*,/] on two columns row-wise
+5 perform join [inner, outer-left,right,full] on two tables
+6 remove a table
+7 sort rows in ascending order based on column values
+8 quit application
+-----------------------------------------------------------
+Enter number (1-8): 5
+
+
+
+Enter left table:
+-----------------------------------------------------------
+List of all existing tables:
+Total number of tables: 2
+Table ID: 2	Filename: tbl2.csv
+Table ID: 1	Filename: tbl1.csv
+-----------------------------------------------------------
+==>	-----------------------------------------------------------
+==>	Enter table id:
+==>	-----------------------------------------------------------
+==>	1
+==>	-----------------------------------------------------------
+
+
+
+Select columns to output from table1:
+==>	-----------------------------------------------------------
+==>	Select columns: 
+==>	Number of columns in table: 2
+==>	Enter space-separated column number or * for all: (ex: 1 2 3 or *)
+==>	-----------------------------------------------------------
+==>	*  
+
+
+
+Enter right table:
+-----------------------------------------------------------
+List of all existing tables:
+Total number of tables: 2
+Table ID: 2	Filename: tbl2.csv
+Table ID: 1	Filename: tbl1.csv
+-----------------------------------------------------------
+==>	-----------------------------------------------------------
+==>	Enter table id:
+==>	-----------------------------------------------------------
+==>	2
+==>	-----------------------------------------------------------
+
+
+
+Select columns to output from table2:
+==>	-----------------------------------------------------------
+==>	Select columns: 
+==>	Number of columns in table: 2
+==>	Enter space-separated column number or * for all: (ex: 1 2 3 or *)
+==>	-----------------------------------------------------------
+==>	2
+
+
+
+JOIN TYPE (1: inner or 2: left outer or 3: right outer or 4: full outer): (ex: 1 or 2 or 3 or 4)
+==>	-----------------------------------------------------------
+==>	2
+
+
+
+Enter JOIN predicate columns: ON col1 == col2, where col1 is from table 1 and col2 is from table 2
+Select col1 from table1:
+==>	-----------------------------------------------------------
+==>	Select columns: 
+==>	Number of columns in table: 2
+==>	Enter column number: (ex: 1)
+==>	-----------------------------------------------------------
+==>	2
+Select col2 from table2:
+==>	-----------------------------------------------------------
+==>	Select columns: 
+==>	Number of columns in table: 2
+==>	Enter column number: (ex: 1)
+==>	-----------------------------------------------------------
+==>	1
+
+
+
+Output result to file? (y/n) n
+
+
+
+Rafferty	31	Sales	
+Jones	33	Engineering	
+Heisenberg	33	Engineering	
+Robinson	34	Clerical	
+Smith	34	Clerical	
+Williams	[NULL]	[NULL]	
+
+
+-----------------------------------------------------------
+----------------TOOL MAIN MENU-----------------------------
+
+Choose from the following options:
+1 add new table
+2 view table - (you could optionally select columns)
+3 get table statistics
+4 perform arithmetic operations [+,-,*,/] on two columns row-wise
+5 perform join [inner, outer-left,right,full] on two tables
+6 remove a table
+7 sort rows in ascending order based on column values
+8 quit application
+-----------------------------------------------------------
+Enter number (1-8): 8
+
+
+
+
+
+
+
+
+
+
