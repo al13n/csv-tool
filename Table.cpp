@@ -20,6 +20,9 @@ void Table::printHeader(PrintWithId id) {
 }
 
 int Table::addNewRow(std::istream &file_in) {
+	/*
+		Parses a csv file based on https://en.wikipedia.org/wiki/Comma-separated_values#Basic_rules
+	*/
 	std::string col_data = "";
 	std::vector< std::shared_ptr<std::string> >row;
 	bool quoted = false;
@@ -71,6 +74,9 @@ void Table::printrows(std::ostream &os, const defs::select_cols &sel) {
 }
 
 bool Table::createMetadata(int col_id) {
+	/*
+		Checks if metadata for the column exists, otherwise helps create the metadata and caches it
+	*/
 	if (col_id == 0 && col_id > num_cols) return false;
 	col_id--;
 	if (col_metadata.find(col_id) != col_metadata.end()) return true;
@@ -119,6 +125,9 @@ void Table::getStatistic(std::ostream& os, int col_id) {
 }
 
 void Table::performSortAsc(std::ostream &os, defs::select_cols &sel, defs::select_cols &pred) {
+	/*
+		Helps sort the rows of the table, based on column in an ascending order
+	*/
 	int col_id = pred.cols[0];
 	auto meta = getColumnMetadata(col_id);
 	
@@ -186,14 +195,18 @@ void Table::performJoin(std::ostream &os, std::shared_ptr<Table> &tbl, defs::sel
 	
 	int idx1 = meta1->null_values;
 	int idx2 = meta2->null_values;
+	// rows1 and rows2 are subsets of matching keys from table1 and table2 respectively
 	std::vector<int> rows1;
 	std::vector<int> rows2;
 
+	// Performs inner join or intersection of two tables based on column values, that are not null
 	while(idx1 < meta1->col_elements.size() && idx2 < meta2->col_elements.size()) {
 		
 		auto key1 = meta1->col_elements[idx1];
 		auto key2 = meta2->col_elements[idx2];
 		
+		// If the keys match, form subsets of row with matching keys and output the pairs
+		// This mainly performs inner join
 		if (key1 == key2) {
 			auto curr = key1;
 			do {
@@ -222,6 +235,7 @@ void Table::performJoin(std::ostream &os, std::shared_ptr<Table> &tbl, defs::sel
 			rows1.clear();
 			rows2.clear();
 		}
+		// We skip the one that's smaller: if the join performed is outer, check if the left/right table needs to be output
 		else if(key1 < key2) {
 			if (join_type == defs::JOIN::OUTER_LEFT || join_type == defs::JOIN::OUTER_FULL) {
 				printrow(os, meta1->col_elements[idx1].row_id, sel1, PrintWithId::False);
@@ -246,6 +260,8 @@ void Table::performJoin(std::ostream &os, std::shared_ptr<Table> &tbl, defs::sel
 			idx2++;
 		}	
 	}
+
+	// Perform the join for remaining keys not yet processed in the kind-of 'merge' procedure, and the null values.
 
 	if (join_type == defs::JOIN::OUTER_LEFT || join_type == defs::JOIN::OUTER_FULL) {
 		for (int i = idx1; i < meta1->col_elements.size(); i++) {

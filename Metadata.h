@@ -40,13 +40,17 @@ class Metadata {
 			bool operator <= (const meta_ele_type&) const;
 			bool operator == (const meta_ele_type&) const;
 			
+			// which row is this element from?
 			int row_id;
+			// which resource does this element point to?
 			std::shared_ptr<std::string> str_ptr;
 		};
 	public:
 		bool is_numeric;
 		double long sum;
+		// Holds the sorted metadata for the column
 		std::vector < meta_ele_type > col_elements;
+		// Number of null elements in this column
 		int null_values;
 	
 };

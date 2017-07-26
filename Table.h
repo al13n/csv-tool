@@ -61,11 +61,14 @@ public:
 	void performJoin(std::ostream &, std::shared_ptr<Table> &, defs::select_cols &, defs::select_cols &, defs::select_cols &, defs::select_cols &, defs::JOIN); 
 	
 private:
+	// This holds the resource, the csv rows for the table (using RAII)
 	unordered_map <int, std::vector< std::shared_ptr<std::string> > > rows;
+	// This holds the cached metadata for the table per column, bbuilt when required 
 	unordered_map <int, std::shared_ptr<Metadata> > col_metadata;
 	int next_row_id, num_cols;
 	bool header;
 	int id;
-	std::shared_ptr<std::string> filename_ptr;	
+	// Just an identifier to the filenames the table was created from
+	std::shared_ptr<std::string> filename_ptr;
 	bool createMetadata(int col_id);
 };

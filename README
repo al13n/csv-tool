@@ -10,7 +10,7 @@ PURPOSE:
 ------------------------------
 
 This is a tool that serves the following purpose:
-- Parses a CSV file, as per these rules: https://en.wikipedia.org/wiki/Comma-separated_values#Basic_rules, and stored them as a Table.
+- Parses a CSV file, as per these rules: https://en.wikipedia.org/wiki/Comma-separated_values#Basic_rules, and stored them as a Table. It assumes a valid CSV file, and does not check for it's validity while parsing.
 - Select columns from a particular file, and view the stored table. For eg: '*' lets you view all columns of table
 - Get statistic on a column from a table that contains numeric data - get median, max, min, average. (It does not take the null rows of the column into the statistic shown) 
 - Perform an arithmetic operation on two columns from the same table, and output the result as a new column.
@@ -26,7 +26,7 @@ Tool.cpp Options.h:
 Holds the iteractive or client part of the tool which interactively builds the query or stores pointers to the backend tables.
 
 Table.h Table.cpp:
-Holds the class that parses a table, stores the table, builds metadata on top of columns when required and caches them for later use.The operations to perform joins and arithmetic ops are specified in this class.
+Holds the class that parses a table, stores the table, builds metadata on top of columns when required and caches them for later use.The operations to perform joins and arithmetic ops are specified in this class. Joins -> use the sort, merge/join algorithm => complexity O(nlogn) => where n are the rows of table. 
 
 Metadata.h Metadata.cpp:
 Holds the class that defines the metadata for a column which could possibly sort them, and compare them. It also provides statistic over that column

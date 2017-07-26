@@ -85,6 +85,7 @@ void getNewTableFromUser() {
 	return;
 }
 
+/* Builds the select column query from a table*/
 defs::select_cols selectColumns (shared_ptr<Table> tbl, ChooseOne chooseOne) {
 	if (tbl == nullptr) return defs::select_cols{};
 	
@@ -139,6 +140,7 @@ defs::select_cols selectColumns (shared_ptr<Table> tbl, ChooseOne chooseOne) {
 	return current_select;
 }
 
+/* builds the select table query */
 shared_ptr<Table> selectTable() {
 	if (!listallTables()) {
 		return nullptr;
