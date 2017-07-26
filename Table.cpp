@@ -161,28 +161,6 @@ void Table::performJoin(std::ostream &os, std::shared_ptr<Table> &tbl, defs::sel
 	
 	if ((meta1->containsOnlyNullValues() || meta1->is_numeric) 
 	&& (meta2->containsOnlyNullValues() || meta2->is_numeric)) {
-		if (join_type == defs::JOIN::OUTER_LEFT || join_type == defs::JOIN::OUTER_FULL) {
-			for (int i = 0; i < meta1->null_values; i++) {
-				printrow(os, meta1->col_elements[i].row_id, sel1, PrintWithId::False);
-				int dummy_r = tbl->hasHeader() ? 0 : 1;
-				sel2.print_null = true;
-				tbl->printrow(os, dummy_r, sel2, PrintWithId::False);
-				sel2.print_null = false;
-				os << std::endl;
-			}
-		}
-
-		if (join_type == defs::JOIN::OUTER_RIGHT || join_type == defs::JOIN::OUTER_FULL) {
-			for (int i = 0; i < meta2->null_values; i++) {
-				int dummy_r = hasHeader() ? 0 : 1;
-				sel1.print_null = true;
-				printrow(os, dummy_r, sel1, PrintWithId::False);
-				sel1.print_null = false;
-				tbl->printrow(os, meta2->col_elements[i].row_id, sel2, PrintWithId::False);
-				os << std::endl;
-			}
-		}
-
 		int idx1 = meta1->null_values;
 		int idx2 = meta2->null_values;
 		std::vector<int> rows1;
@@ -243,6 +221,44 @@ void Table::performJoin(std::ostream &os, std::shared_ptr<Table> &tbl, defs::sel
 				}
 				idx2++;
 			}	
+		}
+		if (join_type == defs::JOIN::OUTER_LEFT || join_type == defs::JOIN::OUTER_FULL) {
+			for (int i = idx1; i < meta1->col_elements.size(); i++) {
+				printrow(os, meta1->col_elements[i].row_id, sel1, PrintWithId::False);
+				int dummy_r = tbl->hasHeader() ? 0 : 1;
+				sel2.print_null = true;
+				tbl->printrow(os, dummy_r, sel2, PrintWithId::False);
+				sel2.print_null = false;
+				os << std::endl;
+			}
+			
+			for (int i = 0; i < meta1->null_values; i++) {
+				printrow(os, meta1->col_elements[i].row_id, sel1, PrintWithId::False);
+				int dummy_r = tbl->hasHeader() ? 0 : 1;
+				sel2.print_null = true;
+				tbl->printrow(os, dummy_r, sel2, PrintWithId::False);
+				sel2.print_null = false;
+				os << std::endl;
+			}
+		}
+
+		if (join_type == defs::JOIN::OUTER_RIGHT || join_type == defs::JOIN::OUTER_FULL) {
+			for (int i = idx2; i < meta2->col_elements.size(); i++) {
+				int dummy_r = hasHeader() ? 0 : 1;
+				sel1.print_null = true;
+				printrow(os, dummy_r, sel1, PrintWithId::False);
+				sel1.print_null = false;
+				tbl->printrow(os, meta2->col_elements[i].row_id, sel2, PrintWithId::False);
+				os << std::endl;
+			}
+			for (int i = 0; i < meta2->null_values; i++) {
+				int dummy_r = hasHeader() ? 0 : 1;
+				sel1.print_null = true;
+				printrow(os, dummy_r, sel1, PrintWithId::False);
+				sel1.print_null = false;
+				tbl->printrow(os, meta2->col_elements[i].row_id, sel2, PrintWithId::False);
+				os << std::endl;
+			}
 		}
 		return ;
 	}		

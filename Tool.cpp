@@ -256,7 +256,9 @@ void performJoin() {
 	defs::select_cols sel2 = selectColumns(tbl2, ChooseOne::False);
 	
 	std::cout << "\n\n\n";
-	std::cout << "JOIN TYPE (1: inner or 2: left outer or 3: right outer or 4: full outer): (ex: 1 or 2 or 3 or 4)";
+	std::cout << "JOIN TYPE (1: inner or 2: left outer or 3: right outer or 4: full outer): (ex: 1 or 2 or 3 or 4)\n";
+	std::cout << "==>\t-----------------------------------------------------------\n";
+	std::cout << "==>\t";
 	std::string choice;
 	std::vector <std::string> avail_choices(4);
 	avail_choices[0] += ('0' + static_cast<int>(defs::JOIN::INNER));
@@ -264,10 +266,10 @@ void performJoin() {
 	avail_choices[2] += ('0' + static_cast<int>(defs::JOIN::OUTER_RIGHT));
 	avail_choices[3] += ('0' + static_cast<int>(defs::JOIN::OUTER_FULL));
 	getChoice(avail_choices, choice);
-	defs::JOIN join_type = static_cast<defs::JOIN> (choice[0]);	
+	defs::JOIN join_type = static_cast<defs::JOIN> (choice[0]-'0');	
 	
 	std::cout << "\n\n\n";
-	std::cout << "INFO: Enter JOIN predicate columns: ON col1 == col2, where col1 is from table 1 and col2 is from table 2\n";
+	std::cout << "Enter JOIN predicate columns: ON col1 == col2, where col1 is from table 1 and col2 is from table 2\n";
 	std::cout << "Select col1 from table1:\n";
 	defs::select_cols pred1 = selectColumns(tbl1, ChooseOne::True);
 	std::cout << "Select col2 from table2:\n";
