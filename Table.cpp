@@ -36,8 +36,8 @@ int Table::addNewRow(std::istream &file_in) {
 			quoted = false;
 		}
 		else {
-			col_data += (c != '"' ? c : '\0');
-			quoted = quoted | (c == '"');
+			if (c == '"') quoted = true;
+			else col_data += c;
 		}
 	}
 	rows.insert(make_pair(next_row_id, row));
@@ -70,7 +70,7 @@ bool Table::createMetadata(int col_id) {
 	col_id--;
 	if (col_metadata.find(col_id) != col_metadata.end()) return true;
 
-	auto meta = make_shared<Metadata>(col_id);
+	std::shared_ptr<Metadata> meta = make_shared<Metadata>(col_id);
 	std::vector < std::shared_ptr<std::string> > ptrs;
 	for (int i = 1; i < next_row_id; i++) {
 		ptrs.push_back(rows[i][col_id]);
@@ -78,36 +78,6 @@ bool Table::createMetadata(int col_id) {
 	meta->setColumn(ptrs);
 	col_metadata.insert(make_pair(col_id, meta));
 	return true;
-}
-
-void Table::Metadata::setColumn(const std::vector < std::shared_ptr<std::string> > &ptrs) {
-	int row_id = 1;
-	for(auto ptr: ptrs) {
-		col_elements.push_back(make_pair(row_id, ptr));
-		row_id++;
-	}
-	
-	if (col_elements.size() != 0) {
-		for (auto col: col_elements) {
-			if (col.second->size() != 0) {
-				is_numeric &= is_string_numeric(col.second);
-			} else {
-				null_values++;
-			}
-		}
-	}
-
-	if (containsOnlyNullValues()) is_numeric = false;
-	
-	if (is_numeric) {
-		merge_sort(col_elements.begin(), col_elements.end(), comp_for_metadata<col_ele_type>);
-		sum = 0;
-		for(auto col: col_elements) {
-			if (col.second->size() != 0) {
-				sum += strtold(col.second->c_str(), NULL);
-			}
-		}
-	}
 }
 
 void Table::getStatistic(std::ostream& os, int col_id) {
@@ -147,5 +117,34 @@ void Table::performArithmeticOp(std::ostream &os, int col_id1, int col_id2, defs
 			os << "-----------------------------------------------------------\n";
 			return ; 
 		}
+		
+		for(int i = 1; i < next_row_id; i++) {
+			auto c1 = rows[i][col_id1];
+			auto c2 = rows[i][col_id2];
+			/*
+			if (is_string_numeric(c1) && is_string_numeric(c2)) {
+				double long val1 = strtold(c1->c_str(), NULL);
+				double long val2 = strtold(c2->c_str(), NULL);
+				switch(op) {
+					case defs::ARITHMETIC_OP::ADD :
+						os << (val1 + val2) << std::endl;
+						break;
+					case defs::ARITHMETIC_OP::MINUS :
+						os << (val1 - val2) << std::endl;
+						break;
+					case defs::ARITHMETIC_OP::MULTIPLY :
+						os << (val1*val2) << std::endl;
+						break;
+					case defs::ARITHMETIC_OP::DIVIDE :
+						if (val2 == 0) {
+							os <<  << std::endl;
+						} else {
+							os << (val1/val2) << std::endl;
+						}
+						break;
+				}
+			}
+			*/	
+		}
 	}
-} 
+}

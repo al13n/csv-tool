@@ -12,6 +12,7 @@
 #include <limits>
 #include "utility.h"
 #include "defs.h"
+#include "Metadata.h"
 
 using namespace std;
 
@@ -26,62 +27,6 @@ enum class PrintWithId: bool {
 };
 
 class Table {
-private:
-	
-	class Metadata {
-		int id;
-		int null_values;
-		typedef typename std::pair<int, std::shared_ptr<std::string> > col_ele_type;
-		std::vector < col_ele_type > col_elements;
-		public:
-			bool is_numeric;
-			double long sum;
-
-			Metadata(int _id): id{_id}, is_numeric{true}, sum{0}, null_values{0} {}
-			~Metadata() {
-				col_elements.clear();
-			}
-				
-			void setColumn(const std::vector < std::shared_ptr<std::string> > &);
-		
-			bool containsOnlyNullValues() { return null_values == col_elements.size(); }
-				
-			long double getMedian() {
-				if (containsOnlyNullValues()) return  std::numeric_limits<long double>::quiet_NaN();
-				int sz = col_elements.size() - null_values;
-				if (sz&1 == 0) {
-					long double val1 = stold(col_elements[null_values + sz/2].second->c_str(), NULL);
-					long double val2 = stold(col_elements[null_values + sz/2 - 1].second->c_str(), NULL);
-					return (val1+val2)/2.0;
-				}
-				return stold(col_elements[null_values + sz/2].second->c_str(), NULL);
-			}
-			
-			long double getMax() {
-				if (containsOnlyNullValues()) return  std::numeric_limits<long double>::quiet_NaN();
-				return stold(col_elements[col_elements.size()-1].second->c_str(), NULL);
-			}
-			
-			long double getMin() {
-				if (containsOnlyNullValues()) return  std::numeric_limits<long double>::quiet_NaN();
-				return stold(col_elements[null_values].second->c_str(), NULL);
-			}
-			
-			long double getAverage() {
-				if (containsOnlyNullValues()) return  std::numeric_limits<long double>::quiet_NaN();
-				return (sum*1.0)/(col_elements.size() - null_values);
-			}
-			
-	};
-	
-	unordered_map <int, std::vector< std::shared_ptr<std::string> > > rows;
-	unordered_map <int, std::shared_ptr<Metadata> > col_metadata;
-	int next_row_id, num_cols;
-	bool header;
-	int id;
-	std::shared_ptr<std::string> filename_ptr;	
-	bool createMetadata(int col_id); 
-	
 public:
 	Table() : next_row_id{0}, num_cols{0}, id{-1} {}
 	Table(istream &, HasHeader);
@@ -109,4 +54,20 @@ public:
 	
 	void performArithmeticOp(std::ostream &, int, int, defs::ARITHMETIC_OP);
 
+	std::shared_ptr<Metadata> getColumnMetadata(int col_id) {
+		if (createMetadata(col_id)) {
+			return col_metadata[col_id-1];
+		}
+		return nullptr;
+	}
+	
+	//void performJoin(std::ostream &, std::shared_ptr<Table> &tbl, 
+private:
+	unordered_map <int, std::vector< std::shared_ptr<std::string> > > rows;
+	unordered_map <int, std::shared_ptr<Metadata> > col_metadata;
+	int next_row_id, num_cols;
+	bool header;
+	int id;
+	std::shared_ptr<std::string> filename_ptr;	
+	bool createMetadata(int col_id);
 };

@@ -8,15 +8,6 @@
 
 namespace {
 	template <typename T>
-	bool comp_for_metadata(const T &p1, const T &p2) {
-		if (p2.second->size() == 0) return false;
-		if (p1.second->size() == 0) return true;
-		double long val1 = strtold(p1.second->c_str(), NULL);
-		double long val2 = strtold(p2.second->c_str(), NULL);
-		return (val2 - val1) > LDBL_EPSILON;
-	}
-	
-	template <typename T>
 	bool comp(const T &a, const T &b) {
 		return a <= b;
 	}
