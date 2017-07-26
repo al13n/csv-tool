@@ -10,17 +10,16 @@ void Metadata::setColumn(const std::vector < std::shared_ptr<std::string> > &ptr
 	if (col_elements.size() != 0) {
 		for (auto col: col_elements) {
 			if (col.str_ptr->size() != 0) {
-				is_numeric &= is_string_numeric(col.str_ptr);
+				if (is_numeric) is_numeric &= is_string_numeric(col.str_ptr);
 			} else {
 				null_values++;
 			}
 		}
 	}
 
-	if (containsOnlyNullValues()) is_numeric = false;
-	
+	merge_sort(col_elements.begin(), col_elements.end(), comp<meta_ele_type>);
+
 	if (is_numeric) {
-		merge_sort(col_elements.begin(), col_elements.end(), comp<meta_ele_type>);
 		sum = 0;
 		for(auto col: col_elements) {
 			if (col.str_ptr->size() != 0) {
@@ -58,11 +57,20 @@ long double Metadata::getAverage() {
 bool Metadata::meta_ele_type::operator < (const meta_ele_type &rhs) const {
 	if (rhs.str_ptr->size() == 0) return false;
 	if (str_ptr->size() == 0) return true;
-	double long val1 = strtold(str_ptr->c_str(), NULL);
-	double long val2 = strtold(rhs.str_ptr->c_str(), NULL);
-	return (val2 - val1) > LDBL_EPSILON;
+	if (is_string_numeric(str_ptr) && is_string_numeric(rhs.str_ptr)) {
+		double long val1 = strtold(str_ptr->c_str(), NULL);
+		double long val2 = strtold(rhs.str_ptr->c_str(), NULL);
+		return (val2 - val1) > LDBL_EPSILON;
+	}
+	int sz = std::min(str_ptr->size(), rhs.str_ptr->size());
+	for (int i = 0; i < sz; i++) {
+		if ((*str_ptr)[i] == (*(rhs.str_ptr))[i]) continue;
+		return (*str_ptr)[i] < (*(rhs.str_ptr))[i]; 
+	}
+	
+	return str_ptr->size() < rhs.str_ptr->size(); 
 }
 
 bool Metadata::meta_ele_type::operator > (const meta_ele_type& rhs) const { return rhs < *this; }
 bool Metadata::meta_ele_type::operator <= (const meta_ele_type& rhs) const { return !(*this > rhs); }
-
+bool Metadata::meta_ele_type::operator == (const meta_ele_type& rhs) const { return !(*this < rhs) && !(*this > rhs); }

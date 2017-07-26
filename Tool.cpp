@@ -216,7 +216,9 @@ void performArithmeticOp() {
 		defs::select_cols sel1 = selectColumns(tbl, ChooseOne::True);
 		
 		std::cout << "\n\n\n";
-		std::cout << "Operator (ex: + or - or / or *):";
+		std::cout << "Operator (ex: + or - or * or /):\n";
+		std::cout << "==>\t-----------------------------------------------------------\n";
+		std::cout << "==>\t";
 		std::string choice;
 		std::vector <std::string> avail_choices(4);
 		avail_choices[0] += static_cast<char>(defs::ARITHMETIC_OP::PLUS); 
@@ -234,7 +236,7 @@ void performArithmeticOp() {
 		std::ostream &os = getOutputStream();
 		
 		std::cout << "\n\n\n";
-		//tbl->performArithmeticOp(os, sel1, sel2, op);
+		tbl->performArithmeticOp(os, sel1, sel2, op);
 	}
 }
 
@@ -282,6 +284,25 @@ void performJoin() {
 	tbl1->performJoin(os, tbl2, sel1, sel2, pred1, pred2, join_type);
 }
 
+void sortInAsc() {
+	std::cout << "\n\n\n";
+	auto tbl = selectTable();
+	if (tbl == nullptr) return ;
+	
+	std::cout << "\n\n\n";
+	std::cout << "Select columns to output from table:\n";
+	defs::select_cols sel = selectColumns(tbl, ChooseOne::False);
+	
+	std::cout << "\n\n\n";
+	std::cout << "Select col from table based on which you want to sort rows on:\n";
+	defs::select_cols pred = selectColumns(tbl, ChooseOne::True);
+
+	std::cout << "\n\n\n";
+	std::ostream &os = getOutputStream();
+	
+	std::cout << "\n\n\n";
+	tbl->performSortAsc(os, sel, pred);
+}
 
 void init() {
 	if (out.is_open()) out.close();
@@ -314,6 +335,9 @@ int main() {
 				break;
 			case MainMenuOptions::DELETE_TABLE:
 				removeTable();
+				break;
+			case MainMenuOptions::SORT_COL_IN_ASCENDING_ORDER:
+				sortInAsc();
 				break;
 			case MainMenuOptions::QUIT:
 				break;

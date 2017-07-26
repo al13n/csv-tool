@@ -32,12 +32,13 @@ class Metadata {
 		
 		class meta_ele_type {
 		public:
-			meta_ele_type() {}
+			meta_ele_type(): row_id{-1} {}
 			meta_ele_type(int _id, std::shared_ptr<std::string> _ptr) : row_id {_id}, str_ptr {_ptr} {}
 			
 			bool operator < (const meta_ele_type&) const;
 			bool operator > (const meta_ele_type&) const;
 			bool operator <= (const meta_ele_type&) const;
+			bool operator == (const meta_ele_type&) const;
 			
 			int row_id;
 			std::shared_ptr<std::string> str_ptr;

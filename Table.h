@@ -50,16 +50,13 @@ public:
 	void printrow(std::ostream &, int, const defs::select_cols &, PrintWithId);
 	void printrows(std::ostream &, const defs::select_cols &);
 
+	std::shared_ptr<Metadata> getColumnMetadata(int);
+	
 	void getStatistic(std::ostream &, int);
 	
-	void performArithmeticOp(std::ostream &, int, int, defs::ARITHMETIC_OP);
+	void performArithmeticOp(std::ostream &, defs::select_cols &, defs::select_cols &, defs::ARITHMETIC_OP);
 
-	std::shared_ptr<Metadata> getColumnMetadata(int col_id) {
-		if (createMetadata(col_id)) {
-			return col_metadata[col_id-1];
-		}
-		return nullptr;
-	}
+	void performSortAsc(std::ostream &, defs::select_cols &, defs::select_cols &);
 	
 	void performJoin(std::ostream &, std::shared_ptr<Table> &, defs::select_cols &, defs::select_cols &, defs::select_cols &, defs::select_cols &, defs::JOIN); 
 	

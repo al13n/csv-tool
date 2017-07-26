@@ -9,6 +9,7 @@ enum class MainMenuOptions {
 	PERFORM_ARITHMETIC_OP,
 	PERFORM_JOIN,
 	DELETE_TABLE,
+	SORT_COL_IN_ASCENDING_ORDER,
 	QUIT,
 	INVALID
 };
@@ -37,6 +38,9 @@ std::ostream& operator<<(std::ostream& os, MainMenuOptions opt) {
 			break;
 		case MainMenuOptions::DELETE_TABLE:
 			os << "remove a table";
+			break;
+		case MainMenuOptions::SORT_COL_IN_ASCENDING_ORDER:
+			os << "sort rows in ascending order based on column values";
 			break;
 		case MainMenuOptions::QUIT:
 			os << "quit application";
@@ -78,12 +82,13 @@ MainMenuOptions showMainMenu() {
 	cout << "4 " << MainMenuOptions::PERFORM_ARITHMETIC_OP << endl;	
 	cout << "5 " << MainMenuOptions::PERFORM_JOIN << endl;	
 	cout << "6 " << MainMenuOptions::DELETE_TABLE << endl;
-	cout << "7 " << MainMenuOptions::QUIT << endl;
+	cout << "7 " << MainMenuOptions::SORT_COL_IN_ASCENDING_ORDER << endl;
+	cout << "8 " << MainMenuOptions::QUIT << endl;
 	cout << "-----------------------------------------------------------\n";
-	cout << "Enter number (1-7): ";
+	cout << "Enter number (1-8): ";
 	std::string choice;
 	std::vector<std::string> avail_choices;
-	for(int i = 1; i <= 7; i++) {
+	for(int i = 1; i <= 8; i++) {
 		char c = i + '0';
 		string s = ""; s = s + c;
 		avail_choices.push_back(s);
@@ -103,6 +108,8 @@ MainMenuOptions showMainMenu() {
 		case 6: 
 			return MainMenuOptions::DELETE_TABLE;
 		case 7:
+			return MainMenuOptions::SORT_COL_IN_ASCENDING_ORDER;
+		case 8:
 			return MainMenuOptions::QUIT;
 		default:
 			break;
